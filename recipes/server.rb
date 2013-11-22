@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+cant_search = Chef::Config[:solo] && node.recipes.grep(/chef-solo-search/).empty?
+
 unless node['munin']['public_domain']
   if node['public_domain']
     case node.chef_environment
@@ -51,21 +53,26 @@ end
 include_recipe 'munin::client'
 
 sysadmins = []
-if Chef::Config[:solo]
+if cant_search
   sysadmins = data_bag('users').map { |user| data_bag_item('users', user) }
 else
   sysadmins = search(:users, 'groups:sysadmin')
 end
 
-if Chef::Config[:solo]
+if cant_search
   munin_servers = [node]
 else
   if node['munin']['multi_environment_monitoring']
-    munin_servers = search(:node, 'munin:[* TO *]')
+    if Chef::Config[:solo]
+      munin_servers = search(:node, '*')
+    else
+      munin_servers = search(:node, 'munin:[* TO *]')
+    end
   else
     munin_servers = search(:node, "munin:[* TO *] AND chef_environment:#{node.chef_environment}")
   end
 end
+
 
 if munin_servers.empty?
   Chef::Log.info 'No nodes returned from search, using this node so munin configuration has data'

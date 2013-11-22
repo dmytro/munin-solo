@@ -19,7 +19,9 @@
 
 service_name = node['munin']['service_name']
 
-if Chef::Config[:solo]
+cant_search = Chef::Config[:solo] && node.recipes.grep(/chef-solo-search/).empty?
+
+if cant_search
   munin_servers = [node]
 else
   if node['munin']['multi_environment_monitoring']
@@ -30,6 +32,8 @@ else
 end
 
 munin_servers.sort! { |a, b| a['name'] <=> b['name'] }
+
+puts "********************************* SERVERS #{munin_servers}"
 
 package 'munin-node'
 
