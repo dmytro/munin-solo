@@ -33,8 +33,6 @@ end
 
 munin_servers.sort! { |a, b| a['name'] <=> b['name'] }
 
-puts "********************************* SERVERS #{munin_servers}"
-
 package 'munin-node'
 
 template "#{node['munin']['basedir']}/munin-node.conf" do
