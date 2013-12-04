@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+#  Copyright: 2011 Opscode, Inc.
+#  Author: Bryan McLellan <btm@loftninjas.org>
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+ 
+require 'rubygems'
+require 'raindrops'
+ 
+def collect(port)
+  # raindrops requires an array of strings, even if it denies this
+  addr = [ "0.0.0.0:#{port}" ]
+  stats = Raindrops::Linux.tcp_listener_stats(addr)
+ 
+  puts "active.value #{stats[addr[0]].active}"
+  puts "queued.value #{stats[addr[0]].queued}"
+end
+ 
+if ARGV[0] == "config"
+  puts "graph_title Unicorn - connections"
+  puts "graph_args -l 0"
+  puts "graph_printf %6.0lf"
+  puts "graph_vlabel connections"
+  puts "graph_category Unicorn"
+  puts "active.label active"
+  puts "queued.label queued"
+  exit 0
+end
+ 
+if $0 =~ /.*_(\d+)/
+  # the munin wildcard format of plugin_value
+  port = $1
+elsif ARGV.size > 0
+  port = ARGV[0]
+else
+  usage = "Usage: #$0 port or #{$0}_port"
+  abort usage
+end
+ 
+collect(port)
