@@ -45,9 +45,9 @@ when :apache
   web_group = node['apache']['group']
 when :nginx
   include_recipe 'munin::server_nginx'
-  web_group = node['nginx']['group']
+  web_group = node[:nginx][:group]
 else
-  raise 'Unsupported web server type provided for munin. Supported: apache or nginx'
+  fail 'Unsupported web server type provided for munin. Supported: apache or nginx'
 end
 
 include_recipe 'munin::client'
@@ -140,7 +140,8 @@ else
 end
 
 directory node['munin']['docroot'] do
-  owner 'munin'
-  group 'munin'
-  mode  '0755'
+  owner "munin"
+  group "munin"
+  recursive true
+  mode 0755
 end

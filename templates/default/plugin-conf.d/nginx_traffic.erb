@@ -1,0 +1,14 @@
+[nginx_traffic]
+#
+# Virtual host list
+env.vhosts "<%= node[:nginx][:vhost] -%> munin"
+#
+# Log path
+env.logdir  <%= node[:nginx][:log_dir] %>
+
+env.logfile access.log
+
+#
+# Position of the $bytes_sent in the access.log file
+#
+env.bparam 10

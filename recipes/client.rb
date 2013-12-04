@@ -42,15 +42,10 @@ template "#{node['munin']['basedir']}/munin-node.conf" do
   notifies :restart, "service[#{service_name}]"
 end
 
-case node['platform']
-when 'arch', 'smartos'
-  execute 'munin-node-configure --shell | sh' do
+# case node[:platform]
+# when "arch"
+  execute "munin-node-configure --shell | sh" do
     not_if { Dir.entries(node['munin']['plugins']).length > 2 }
     notifies :restart, "service[#{service_name}]"
   end
-end
-
-service service_name do
-  supports :restart => true
-  action [:start, :enable]
-end
+# end
