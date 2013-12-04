@@ -3,7 +3,11 @@
 
 server {
   listen <%= node['munin']['web_server_port'] %>;
+  <% if node['munin']['url'] %>
+  server_name <%= node['munin']['url'] %>;
+  <% else %>
   server_name munin <%= node['munin']['public_domain'] %> <%= node['fqdn'] %>;
+  <% end %>
   access_log <%= File.join(node['nginx']['log_dir'], 'nginx_access.log') %>;
   error_log <%= File.join(node['nginx']['log_dir'], 'nginx_error.log') %>;
 
