@@ -54,3 +54,17 @@ service service_name do
   supports :restart => true
   action [:start, :enable]
 end
+
+#
+# Fix for Ubuntu restart problem. Add sleep between stop/start.
+#
+if platform?('ubuntu')
+  template "/etc/init.d/munin-node" do
+    source "munin-node.init.d"
+    action :create
+    mode 500
+    group 'root'
+    owner  'root'
+    notifies :restart, "service[munin-node]"
+  end
+end
